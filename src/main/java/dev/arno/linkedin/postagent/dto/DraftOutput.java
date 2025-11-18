@@ -1,6 +1,6 @@
 package dev.arno.linkedin.postagent.dto;
 
-public record DraftResponse(
+public record DraftOutput(
         String draft,
         int charCount
 ) {}
