@@ -37,7 +37,7 @@ public class Prompts {
       """.formatted(ideaTitle, format.name(), keys);
     }
 
-    public static String draftPrompt(OutlineOutput outline, String brief, Topic topic, Tone tone, Constraints c){
+    public static String draftPrompt(OutlineOutput outline, String brief, Topic topic, Tone tone, String c){
         String base = (outline!=null) ? ("Use this outline:\n" + toJson(outline)) : ("Brief:\n" + brief);
         return """
       Write a LinkedIn post. Topic: %s. Tone: %s.
@@ -89,7 +89,7 @@ public class Prompts {
       """.formatted(style, text);
     }
 
-    public static String packagePrompt(String text, List<String> hashtags, String imagePrompt, Constraints c){
+    public static String packagePrompt(String text, List<String> hashtags, String imagePrompt, String c){
         return """
       Package the final LinkedIn post. Enforce constraints: %s
       Ensure final text ≤ constraints.maxChars (default 2200), uses line breaks, and includes hashtags at the end (3–5 total).

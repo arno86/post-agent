@@ -139,4 +139,117 @@ public class PostsController {
         }
         return trimmed;
     }
+
+    @PostMapping("/posts/full")
+    public FullPostOutput full(@Valid @RequestBody FullPostInput input) throws Exception {
+        // sensible defaults
+        String tone = (input.tone() == null || input.tone().isBlank())
+                ? "practical"
+                : input.tone();
+        int maxTags = (input.maxHashtags() == null || input.maxHashtags() <= 0)
+                ? 5
+                : input.maxHashtags();
+
+        // 1) Get a few ideas and pick the first
+        String ideasJson = llm.chat(List.of(
+                LlmMessage.system(Prompts.SYSTEM),
+                LlmMessage.user("""
+                    I need LinkedIn post ideas.
+
+                    Topic: %s
+                    Audience: %s
+                    Goal: %s
+
+                    Return a JSON array of short title strings.
+                    """.formatted(input.topic(), input.audience(), input.goal()))
+        ));
+        // Example expected: ["Title 1", "Title 2", ...]
+        var ideasNode = mapper.readTree(ideasJson);
+        String ideaTitle = ideasNode.isArray() && ideasNode.size() > 0
+                ? ideasNode.get(0).asText()
+                : input.goal(); // fallback
+
+        // 2) Outline
+        String outlineJson = llm.chat(List.of(
+                LlmMessage.system(Prompts.SYSTEM),
+                LlmMessage.user("""
+                    Create a concise outline for a LinkedIn post with this title:
+
+                    "%s"
+
+                    Audience: %s
+                    Tone: %s
+
+                    Return JSON: { "outline": "..." }
+                    """.formatted(ideaTitle, input.audience(), tone))
+        ));
+        String outline = mapper.readTree(outlineJson).path("outline").asText();
+
+        // 3) Draft
+        String draft = llm.chat(List.of(
+                LlmMessage.system(Prompts.SYSTEM),
+                LlmMessage.user("""
+                    Write a LinkedIn post using this outline:
+
+                    %s
+
+                    Audience: %s
+                    Tone: %s
+                    Constraints: %s
+
+                    Return ONLY the post text, no JSON.
+                    """.formatted(outline, input.audience(), tone,
+                        input.constraints() == null ? "" : input.constraints()))
+        ));
+
+        // 4) Hashtags
+        String hashtagsJson = llm.chat(List.of(
+                LlmMessage.system(Prompts.SYSTEM),
+                LlmMessage.user("""
+                    Generate up to %d high-quality hashtags for this LinkedIn post:
+
+                    %s
+
+                    Return JSON: { "hashtags": ["#tag1", "#tag2", ...] }
+                    """.formatted(maxTags, draft))
+        ));
+        var tagsNode = mapper.readTree(hashtagsJson).path("hashtags");
+        java.util.List<String> hashtags = new java.util.ArrayList<>();
+        if (tagsNode.isArray()) {
+            tagsNode.forEach(n -> hashtags.add(n.asText()));
+        }
+
+        // 5) Image prompt
+        String imageJson = llm.chat(List.of(
+                LlmMessage.system(Prompts.SYSTEM),
+                LlmMessage.user("""
+                    Create a concise prompt for an illustration or header image
+                    that would go well with this LinkedIn post:
+
+                    %s
+
+                    Return JSON: { "imagePrompt": "..." }
+                    """.formatted(draft))
+        ));
+        String imagePrompt = mapper.readTree(imageJson).path("imagePrompt").asText();
+
+        // 6) Final packaged text (post + hashtags)
+        String tagsLine = hashtags.isEmpty()
+                ? ""
+                : "\n\n" + String.join(" ", hashtags);
+
+        String finalText = draft.trim() + tagsLine;
+        int charCount = dev.arno.linkedin.postagent.service.PackagingService.countChars(finalText);
+
+        return new FullPostOutput(
+                ideaTitle,
+                outline,
+                draft,
+                hashtags,
+                imagePrompt,
+                finalText,
+                charCount
+        );
+    }
+
 }

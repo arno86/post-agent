@@ -8,5 +8,5 @@ public record PackageInput(
         @NotBlank String text,
         List<String> hashtags,
         String imagePrompt,
-        Constraints constraints
+        String constraints
 ) {}

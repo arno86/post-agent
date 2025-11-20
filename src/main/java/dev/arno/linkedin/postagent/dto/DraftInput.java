@@ -5,5 +5,5 @@ public record DraftInput(
         String brief,
         Topic topic,
         Tone tone,
-        Constraints constraints
+        String constraints
 ) {}
