@@ -240,9 +240,7 @@ const app = express();
 app.use(express.json());
 
 app.post("/mcp", async (req, res) => {
-  const transport = new StreamableHTTPServerTransport({
-    enableJsonResponse: true
-  });
+  const transport = new StreamableHTTPServerTransport({sessionIdGenerator: undefined});
 
   res.on("close", () => {
     transport.close();
