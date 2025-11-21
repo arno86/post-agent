@@ -2,10 +2,10 @@ FROM eclipse-temurin:21-jdk AS build
 LABEL authors="arnotserunyan"
 WORKDIR /app
 
-COPY gradlew ./
-COPY gradle gradle
-COPY build.gradle settings.gradle ./
-COPY src src
+COPY backend/gradlew ./gradlew
+COPY backend/gradle ./gradle
+COPY backend/build.gradle backend/settings.gradle ./
+COPY backend/src ./src
 
 RUN chmod +x gradlew
 RUN ./gradlew clean bootJar --no-daemon
