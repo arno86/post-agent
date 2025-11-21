@@ -1,10 +1,7 @@
-
-LABEL authors="arnotserunyan"
-
 # Dockerfile for Node MCP server
 
 FROM node:20-alpine
-
+LABEL authors="arnotserunyan"
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
