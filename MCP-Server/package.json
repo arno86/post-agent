@@ -2,9 +2,9 @@
   "name": "linkedin-mcp-server",
   "version": "1.0.0",
   "type": "module",
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p .",
     "start": "node dist/index.js"
   },
   "dependencies": {
@@ -13,6 +13,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.5",
     "@types/node": "^22.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.0"

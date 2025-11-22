@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { z } from "zod";
 import {
   McpServer
@@ -240,13 +240,13 @@ server.registerTool(
 const app = express();
 app.use(express.json());
 
-app.get("/health", (req, res) => {
+app.get("/health", (req: Request, res: Response) => {
   res.json({ ok: true, backend: BACKEND_BASE_URL });
 });
 
 app.use(express.json());
 
-app.post("/mcp", async (req, res) => {
+app.post("/mcp", async (req: Request, res: Response) => {
   const transport = new StreamableHTTPServerTransport({sessionIdGenerator: undefined});
 
   res.on("close", () => {
