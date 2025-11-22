@@ -6,7 +6,7 @@ LABEL authors="arnotserunyan"
 WORKDIR /app
 
 # 1) Install deps (including dev – we need typescript to build)
-COPY package.json package-lock.json* ./
+COPY MCP-Server/package.json  MCP-Server/package-lock.json* ./
 RUN npm install
 
 # 2) Copy the rest of the source
