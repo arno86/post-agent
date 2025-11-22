@@ -4,7 +4,7 @@ FROM node:20-alpine
 LABEL authors="arnotserunyan"
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY MCP-Server/package.json MCP-Server/package-lock.json* ./
 RUN npm install --only=production
 
 COPY . .
