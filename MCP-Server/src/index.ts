@@ -234,9 +234,16 @@ server.registerTool(
     }
 );
 
+
 // ---------- HTTP transport (/mcp endpoint) ----------
 
 const app = express();
+app.use(express.json());
+
+app.get("/health", (req, res) => {
+  res.json({ ok: true, backend: BACKEND_BASE_URL });
+});
+
 app.use(express.json());
 
 app.post("/mcp", async (req, res) => {
@@ -295,6 +302,7 @@ server.registerTool(
         ]
       };
     }
+
 );
 
 
