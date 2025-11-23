@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import {
   McpServer
@@ -238,6 +238,10 @@ server.registerTool(
 // ---------- HTTP transport (/mcp endpoint) ----------
 
 const app = express();
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log("Incoming request:", req.method, req.url);
+  next();
+});
 app.use(express.json());
 
 app.get("/health", (req: Request, res: Response) => {
@@ -262,6 +266,7 @@ app.listen(PORT, "0.0.0.0", () => {
       `LinkedIn MCP server running on 0.0.0.0:${PORT}/mcp (backend: ${BACKEND_BASE_URL})`
   );
 });
+
 server.registerTool(
     "posts_full",
     {
