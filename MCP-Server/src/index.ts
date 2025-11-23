@@ -257,12 +257,11 @@ app.post("/mcp", async (req: Request, res: Response) => {
   await transport.handleRequest(req, res, req.body);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(
-    `LinkedIn MCP server running on http://localhost:${PORT}/mcp (backend: ${BACKEND_BASE_URL})`
+      `LinkedIn MCP server running on 0.0.0.0:${PORT}/mcp (backend: ${BACKEND_BASE_URL})`
   );
 });
-
 server.registerTool(
     "posts_full",
     {
