@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import {
   McpServer
@@ -234,12 +234,27 @@ server.registerTool(
     }
 );
 
+
 // ---------- HTTP transport (/mcp endpoint) ----------
 
 const app = express();
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log("Incoming request:", req.method, req.url);
+  next();
+});
 app.use(express.json());
 
-app.post("/mcp", async (req, res) => {
+app.get("/health", (req: Request, res: Response) => {
+  res.json({ ok: true, backend: BACKEND_BASE_URL });
+});
+app.get("/", (req: Request, res: Response) => {
+  res.send("MCP server OK");
+});
+
+app.use(express.json());
+
+
+app.post("/mcp", async (req: Request, res: Response) => {
   const transport = new StreamableHTTPServerTransport({sessionIdGenerator: undefined});
 
   res.on("close", () => {
@@ -250,9 +265,9 @@ app.post("/mcp", async (req, res) => {
   await transport.handleRequest(req, res, req.body);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(
-    `LinkedIn MCP server running on http://localhost:${PORT}/mcp (backend: ${BACKEND_BASE_URL})`
+      `LinkedIn MCP server running on 0.0.0.0:${PORT}/mcp (backend: ${BACKEND_BASE_URL})`
   );
 });
 
@@ -295,6 +310,7 @@ server.registerTool(
         ]
       };
     }
+
 );
 
 
