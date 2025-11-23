@@ -250,7 +250,22 @@ app.get("/health", (req: Request, res: Response) => {
 app.get("/", (req: Request, res: Response) => {
   res.send("MCP server OK");
 });
+
+process.on("SIGTERM", () => {
+  console.log("Received SIGTERM, shutting down gracefully");
+  process.exit(0);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught exception:", err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled rejection:", reason);
+});
+
 app.use(express.json());
+
 
 app.post("/mcp", async (req: Request, res: Response) => {
   const transport = new StreamableHTTPServerTransport({sessionIdGenerator: undefined});

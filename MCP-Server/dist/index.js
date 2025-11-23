@@ -169,9 +169,16 @@ server.registerTool("posts_package", {
 });
 // ---------- HTTP transport (/mcp endpoint) ----------
 const app = express();
+app.use((req, res, next) => {
+    console.log("Incoming request:", req.method, req.url);
+    next();
+});
 app.use(express.json());
 app.get("/health", (req, res) => {
     res.json({ ok: true, backend: BACKEND_BASE_URL });
+});
+app.get("/", (req, res) => {
+    res.send("MCP server OK");
 });
 app.use(express.json());
 app.post("/mcp", async (req, res) => {
@@ -182,8 +189,8 @@ app.post("/mcp", async (req, res) => {
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
 });
-app.listen(PORT, () => {
-    console.log(`LinkedIn MCP server running on http://localhost:${PORT}/mcp (backend: ${BACKEND_BASE_URL})`);
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`LinkedIn MCP server running on 0.0.0.0:${PORT}/mcp (backend: ${BACKEND_BASE_URL})`);
 });
 server.registerTool("posts_full", {
     title: "Generate a full LinkedIn post (idea → draft → hashtags → image prompt)",
