@@ -247,7 +247,9 @@ app.use(express.json());
 app.get("/health", (req: Request, res: Response) => {
   res.json({ ok: true, backend: BACKEND_BASE_URL });
 });
-
+app.get("/", (req: Request, res: Response) => {
+  res.send("MCP server OK");
+});
 app.use(express.json());
 
 app.post("/mcp", async (req: Request, res: Response) => {
